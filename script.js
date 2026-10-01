@@ -10,7 +10,7 @@
   /* 1. KONFIGURASI SUPABASE */
   const SUPABASE_URL = "https://lzuqaqysqmavxxstifjy.supabase.co";
   const SUPABASE_KEY = "sb_publishable_XAbDjSXAHywqAGJ4eWz3OA_iO5PDNiF";
-  const STORAGE_BUCKET = "ALBUM-PHOTOS";
+  const STORAGE_BUCKET = "album-photos";
 
   // Tanggal awal hubungan: 24 April 2024
   const START_DATE = new Date("2024-04-24T00:00:00+09:00");
