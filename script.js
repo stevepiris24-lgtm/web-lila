@@ -523,44 +523,81 @@
   }
 
   function renderAlbums() {
-    const container = $("albumGrid");
-    if (!container) return;
+  const container = $("albumGrid");
+  if (!container) return;
 
-    if (!albumCache.length) {
-      container.innerHTML =
-        '<p class="empty-state">Belum ada album kenangan. Login admin untuk membuat album pertama. ♡</p>';
-      return;
-    }
-
-    container.innerHTML = albumCache.map((album) => {
-      const albumTitle = album.judul || album.title || "Album kenangan";
-      const cover = album.cover_url
-        ? `<img class="album-cover" src="${escapeHTML(album.cover_url)}" alt="Sampul ${escapeHTML(albumTitle)}" loading="lazy">`
-        : '<div class="album-placeholder">♡</div>';
-
-      const actions = currentUser
-        ? `<div class="album-actions">
-             <button class="small-button" data-add-photo="${escapeHTML(album.id)}" type="button">+ Tambah Foto</button>
-             <button class="danger-button" data-delete-album="${escapeHTML(album.id)}" type="button">Hapus</button>
-           </div>`
-        : "";
-
-      return `
-        <article class="album-card">
-          <button class="album-open" data-open-album="${escapeHTML(album.id)}" type="button">
-            <span class="highlight-ring">${cover}</span>
-            <div class="album-info">
-              <h3>${escapeHTML(albumTitle)}</h3>
-              <p>${escapeHTML(formatDate(album.tanggal || album.event_date))}</p>
-              <p>${escapeHTML(album.lokasi || "Kenangan kita ♡")}</p>
-              <span class="highlight-hint">Buka highlight ♡</span>
-            </div>
-          </button>
-          ${actions}
-        </article>
-      `;
-    }).join("");
+  if (!albumCache.length) {
+    container.innerHTML = `
+      <p class="empty-state">
+        Belum ada album kenangan. Login admin untuk membuat album pertama. ♡
+      </p>
+    `;
+    return;
   }
+
+  container.innerHTML = albumCache.map((album) => {
+    const title = album.judul || album.title || "Album kenangan";
+
+    const cover = album.cover_url
+      ? `
+        <img
+          class="album-cover"
+          src="${escapeHTML(album.cover_url)}"
+          alt="Sampul ${escapeHTML(title)}"
+          loading="lazy"
+        >
+      `
+      : `<span class="album-placeholder">♡</span>`;
+
+    const actions = currentUser
+      ? `
+        <div class="album-actions">
+          <button
+            class="small-button"
+            data-add-photo="${escapeHTML(album.id)}"
+            type="button"
+          >+ Tambah Foto</button>
+
+          <button
+            class="danger-button"
+            data-delete-album="${escapeHTML(album.id)}"
+            type="button"
+          >Hapus</button>
+        </div>
+      `
+      : "";
+
+    return `
+      <article class="album-card">
+        <button
+          class="album-open"
+          data-open-album="${escapeHTML(album.id)}"
+          type="button"
+          aria-label="Buka album ${escapeHTML(title)}"
+        >
+          <span class="highlight-ring">
+            <span class="highlight-inner">
+              ${cover}
+            </span>
+          </span>
+
+          <span class="album-info">
+            <span class="album-title">${escapeHTML(title)}</span>
+            <span class="album-date">
+              ${escapeHTML(formatDate(album.tanggal || album.event_date))}
+            </span>
+            <span class="album-location">
+              ${escapeHTML(album.lokasi || "Kenangan kita ♡")}
+            </span>
+            <span class="highlight-hint">Buka highlight ♡</span>
+          </span>
+        </button>
+
+        ${actions}
+      </article>
+    `;
+  }).join("");
+}
 
   async function createAlbum(event) {
     event.preventDefault();
