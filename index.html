@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090809">
+  <meta name="description" content="Album kenangan dan perjalanan cerita kita.">
+  <title>Untuk Lila ♡</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <header class="navbar">
+    <a href="#home" class="brand">Untuk Kita ♡</a>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#cerita">Cerita</a>
+      <a href="#album">Album</a>
+      <button id="adminButton" class="admin-nav" type="button">Admin</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="hero section-wrap">
+      <div class="hero-copy">
+        <p class="script-title">Untuk Lila ♡</p>
+        <h1>Setiap hari<br>bersamamu<br>adalah rumah.</h1>
+        <p class="since">
+          Sejak <strong id="startDateText">24 April 2024</strong>
+          — sudah <strong id="daysTogether">0</strong> hari bersama
+          <span class="pink">♥</span>
+        </p>
+        <div class="stats">
+          <article class="stat-card">
+            <span class="stat-icon">⌛</span>
+            <h2>Jam Terbang</h2>
+            <p><strong id="hoursTogether">0</strong> jam bersama</p>
+            <small>Setiap detik adalah kenangan.</small>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon">♫</span>
+            <h2>Playlist</h2>
+            <p>Lagu-lagu kita</p>
+            <a href="#cerita" class="text-link">Buka kenangan ↓</a>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon pink">”</span>
+            <h2>Catatan kecil</h2>
+            <p>Setiap hari bersamamu adalah rumah.</p>
+          </article>
+        </div>
+      </div>
+      <div class="hero-photo-frame">
+        <img
+          src="./assets/images/foto.jpg"
+          alt="Foto kenangan kita"
+          class="hero-photo"
+          onerror="this.style.display='none';this.parentElement.classList.add('no-photo')"
+        >
+        <span class="photo-fallback">♡<br>Foto kita</span>
+      </div>
+    </section>
+
+    <section id="cerita" class="section-wrap content-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">OUR STORY</p>
+          <h2>Timeline Cerita</h2>
+          <p class="muted">Potongan kecil dari perjalanan yang menjadi cerita besar kita.</p>
+        </div>
+        <button id="addTimelineButton" class="primary-button admin-only" type="button" hidden>
+          + Tambah Cerita
+        </button>
+      </div>
+      <div id="timelineList" class="timeline-list">
+        <p class="empty-state">Memuat cerita...</p>
+      </div>
+    </section>
+
+    <section id="album" class="section-wrap content-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">MEMORIES</p>
+          <h2>Album Kenangan</h2>
+          <p class="muted">Semua momen indah kita, disimpan dalam satu tempat.</p>
+        </div>
+        <button id="addAlbumButton" class="primary-button admin-only" type="button" hidden>
+          + Buat Album
+        </button>
+      </div>
+      <div id="albumGrid" class="album-grid">
+        <p class="empty-state">Memuat album...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Dibuat dengan <span class="pink">♥</span> untuk kita.</p>
+  </footer>
+
+  <!-- LOGIN ADMIN -->
+  <div id="loginModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="close-button" data-close="loginModal" aria-label="Tutup" type="button">×</button>
+      <p class="eyebrow">PRIVATE SPACE</p>
+      <h2>Login Admin</h2>
+      <p class="muted">Masuk untuk mengelola cerita dan album kenangan.</p>
+      <form id="loginForm">
+        <label for="loginEmail">Email admin</label>
+        <input id="loginEmail" type="email" autocomplete="username" required placeholder="email@example.com">
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Masukkan password">
+        <button id="loginSubmit" class="primary-button full-button" type="submit">Masuk</button>
+        <p id="loginMessage" class="form-message" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- TAMBAH CERITA -->
+  <div id="storyModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="close-button" data-close="storyModal" aria-label="Tutup" type="button">×</button>
+      <h2>Tambah Cerita</h2>
+      <form id="storyForm">
+        <label for="storyTitle">Judul cerita</label>
+        <input id="storyTitle" maxlength="150" required placeholder="Hari pertama kita...">
+        <label for="storyDate">Tanggal</label>
+        <input id="storyDate" type="date" required>
+        <label for="storyLocation">Lokasi</label>
+        <input id="storyLocation" maxlength="150" placeholder="Ambon...">
+        <label for="storyDescription">Cerita</label>
+        <textarea id="storyDescription" maxlength="10000" rows="5" required placeholder="Ceritakan momen ini..."></textarea>
+        <label for="storyPhoto">Foto (opsional)</label>
+        <input id="storyPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+        <button class="primary-button full-button" type="submit">Simpan Cerita</button>
+        <p id="storyMessage" class="form-message" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- BUAT ALBUM -->
+  <div id="albumModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="close-button" data-close="albumModal" aria-label="Tutup" type="button">×</button>
+      <h2>Buat Album</h2>
+      <form id="albumForm">
+        <label for="albumTitle">Nama album</label>
+        <input id="albumTitle" maxlength="150" required placeholder="Kenangan pertama kita">
+        <label for="albumDate">Tanggal kenangan</label>
+        <input id="albumDate" type="date" required>
+        <label for="albumLocation">Lokasi</label>
+        <input id="albumLocation" maxlength="150" placeholder="Tempat kenangan">
+        <label for="albumDescription">Cerita album</label>
+        <textarea id="albumDescription" maxlength="10000" rows="4" placeholder="Ceritakan album ini..."></textarea>
+        <label for="albumCover">Foto sampul</label>
+        <input id="albumCover" type="file" accept="image/jpeg,image/png,image/webp" required>
+        <button class="primary-button full-button" type="submit">Simpan Album</button>
+        <p id="albumMessage" class="form-message" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- DETAIL ALBUM -->
+  <div id="albumDetailModal" class="modal" aria-hidden="true">
+    <div class="modal-card album-detail-card">
+      <button class="close-button" data-close="albumDetailModal" aria-label="Tutup" type="button">×</button>
+      <div id="albumDetailContent"></div>
+      <form id="photoForm" class="admin-only photo-upload-form" hidden>
+        <label for="albumPhotos">Tambahkan foto ke album</label>
+        <input id="albumPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+        <button class="primary-button" type="submit">Unggah Foto</button>
+        <p id="photoMessage" class="form-message" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
