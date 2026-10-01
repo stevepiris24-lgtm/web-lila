@@ -37,6 +37,7 @@
           — sudah <strong id="daysTogether">0</strong> hari bersama
           <span class="pink">♥</span>
         </p>
+
         <div class="stats">
           <article class="stat-card">
             <span class="stat-icon">⌛</span>
@@ -57,6 +58,7 @@
           </article>
         </div>
       </div>
+
       <div class="hero-photo-frame">
         <img
           src="./assets/images/foto.jpg"
@@ -79,6 +81,7 @@
           + Tambah Cerita
         </button>
       </div>
+
       <div id="timelineList" class="timeline-list">
         <p class="empty-state">Memuat cerita...</p>
       </div>
@@ -95,6 +98,7 @@
           + Buat Album
         </button>
       </div>
+
       <div id="albumGrid" class="album-grid">
         <p class="empty-state">Memuat album...</p>
       </div>
@@ -112,11 +116,14 @@
       <p class="eyebrow">PRIVATE SPACE</p>
       <h2>Login Admin</h2>
       <p class="muted">Masuk untuk mengelola cerita dan album kenangan.</p>
+
       <form id="loginForm">
         <label for="loginEmail">Email admin</label>
         <input id="loginEmail" type="email" autocomplete="username" required placeholder="email@example.com">
+
         <label for="loginPassword">Password</label>
         <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Masukkan password">
+
         <button id="loginSubmit" class="primary-button full-button" type="submit">Masuk</button>
         <p id="loginMessage" class="form-message" role="status"></p>
       </form>
@@ -128,17 +135,28 @@
     <div class="modal-card">
       <button class="close-button" data-close="storyModal" aria-label="Tutup" type="button">×</button>
       <h2>Tambah Cerita</h2>
+
       <form id="storyForm">
         <label for="storyTitle">Judul cerita</label>
         <input id="storyTitle" maxlength="150" required placeholder="Hari pertama kita...">
+
         <label for="storyDate">Tanggal</label>
         <input id="storyDate" type="date" required>
+
         <label for="storyLocation">Lokasi</label>
         <input id="storyLocation" maxlength="150" placeholder="Ambon...">
+
         <label for="storyDescription">Cerita</label>
         <textarea id="storyDescription" maxlength="10000" rows="5" required placeholder="Ceritakan momen ini..."></textarea>
+
+        <label for="storyAlbum">Hubungkan ke album highlight (opsional)</label>
+        <select id="storyAlbum">
+          <option value="">Tidak dihubungkan ke album</option>
+        </select>
+
         <label for="storyPhoto">Foto (opsional)</label>
         <input id="storyPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+
         <button class="primary-button full-button" type="submit">Simpan Cerita</button>
         <p id="storyMessage" class="form-message" role="status"></p>
       </form>
@@ -150,17 +168,23 @@
     <div class="modal-card">
       <button class="close-button" data-close="albumModal" aria-label="Tutup" type="button">×</button>
       <h2>Buat Album</h2>
+
       <form id="albumForm">
         <label for="albumTitle">Nama album</label>
         <input id="albumTitle" maxlength="150" required placeholder="Kenangan pertama kita">
+
         <label for="albumDate">Tanggal kenangan</label>
         <input id="albumDate" type="date" required>
+
         <label for="albumLocation">Lokasi</label>
         <input id="albumLocation" maxlength="150" placeholder="Tempat kenangan">
+
         <label for="albumDescription">Cerita album</label>
         <textarea id="albumDescription" maxlength="10000" rows="4" placeholder="Ceritakan album ini..."></textarea>
+
         <label for="albumCover">Foto sampul</label>
         <input id="albumCover" type="file" accept="image/jpeg,image/png,image/webp" required>
+
         <button class="primary-button full-button" type="submit">Simpan Album</button>
         <p id="albumMessage" class="form-message" role="status"></p>
       </form>
@@ -172,6 +196,7 @@
     <div class="modal-card album-detail-card">
       <button class="close-button" data-close="albumDetailModal" aria-label="Tutup" type="button">×</button>
       <div id="albumDetailContent"></div>
+
       <form id="photoForm" class="admin-only photo-upload-form" hidden>
         <label for="albumPhotos">Tambahkan foto ke album</label>
         <input id="albumPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple>

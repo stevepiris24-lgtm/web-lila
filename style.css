@@ -43,7 +43,8 @@ a {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -59,7 +60,8 @@ button:disabled {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--pink);
   outline-offset: 3px;
 }
@@ -303,6 +305,8 @@ textarea:focus-visible {
   display: none !important;
 }
 
+/* TIMELINE CERITA */
+
 .timeline-list {
   display: grid;
   gap: 20px;
@@ -339,6 +343,7 @@ textarea:focus-visible {
 }
 
 .timeline-thumb {
+  display: block;
   width: 100%;
   max-height: 260px;
   object-fit: cover;
@@ -346,69 +351,109 @@ textarea:focus-visible {
   margin-top: 12px;
 }
 
+/* ALBUM HIGHLIGHT */
+
 .album-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 25px;
+  overflow-x: auto;
+  padding: 8px 4px 18px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: #6b4254 transparent;
 }
 
 .album-card {
+  flex: 0 0 132px;
+  width: 132px;
   min-width: 0;
-  overflow: hidden;
-  background: linear-gradient(150deg, #1c191e, #111012);
-  border: 1px solid #2c272e;
-  border-radius: 22px;
-  transition: transform .2s, border-color .2s;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  text-align: center;
+  scroll-snap-align: start;
+  transition: transform .2s;
 }
 
 .album-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 101, 151, .5);
+  transform: translateY(-3px);
 }
 
 .album-open {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   padding: 0;
   color: inherit;
-  text-align: left;
+  text-align: center;
   background: transparent;
   border: 0;
 }
 
-.album-cover {
-  display: block;
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  background: #242126;
-}
-
+.album-cover,
 .album-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 250px;
-  font-size: 42px;
+  width: 112px;
+  height: 112px;
+  flex: 0 0 112px;
+  padding: 4px;
+  border: 2px solid var(--pink);
+  outline: 1px solid rgba(255, 101, 151, .28);
+  outline-offset: 4px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #242126;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.album-placeholder {
   color: var(--pink);
+  font-size: 35px;
   background: linear-gradient(135deg, #28212a, #151218);
 }
 
+.album-open:hover .album-cover,
+.album-open:hover .album-placeholder {
+  transform: scale(1.045);
+  box-shadow: 0 0 22px rgba(255, 101, 151, .18);
+}
+
 .album-info {
-  padding: 19px;
+  width: 100%;
+  padding: 17px 0 4px;
 }
 
 .album-info h3 {
-  margin: 0 0 5px;
-  font-family: "Playfair Display", serif;
-  font-size: 23px;
+  margin: 0 auto 4px;
+  max-width: 132px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
 .album-info p {
+  margin: 3px 0;
   color: var(--muted);
-  margin: 4px 0;
+  font-size: 11px;
+  line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+.album-info p:nth-of-type(2) {
+  display: none;
+}
+
+.highlight-hint {
+  display: inline-block;
+  margin-top: 5px;
+  color: var(--pink-light);
+  font-size: 10px;
 }
 
 .album-actions,
@@ -416,7 +461,8 @@ textarea:focus-visible {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 0 19px 19px;
+  padding: 8px 0 0;
+  justify-content: center;
 }
 
 .small-button,
@@ -434,6 +480,12 @@ textarea:focus-visible {
   border-color: rgba(255, 95, 120, .3);
 }
 
+.album-actions .small-button,
+.album-actions .danger-button {
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
 .empty-state {
   grid-column: 1 / -1;
   padding: 35px 20px;
@@ -442,6 +494,67 @@ textarea:focus-visible {
   background: rgba(25, 22, 26, .65);
   border: 1px dashed #393039;
   border-radius: 18px;
+}
+
+.story-album-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  margin-top: 12px;
+  padding: 9px 13px;
+  color: #ffd7e5;
+  text-align: left;
+  background: rgba(255, 101, 151, .09);
+  border: 1px solid rgba(255, 101, 151, .35);
+  border-radius: 22px;
+  overflow-wrap: anywhere;
+}
+
+.story-album-link:hover {
+  background: rgba(255, 101, 151, .16);
+}
+
+.story-album-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  color: white;
+  background: linear-gradient(135deg, #ff5c92, #9a5bca);
+  border-radius: 50%;
+}
+
+/* DETAIL ALBUM DAN CERITA TERKAIT */
+
+.album-related-stories {
+  margin: 24px 0;
+  padding: 18px;
+  background: rgba(255, 101, 151, .045);
+  border: 1px solid rgba(255, 101, 151, .16);
+  border-radius: 16px;
+}
+
+.album-related-stories h3 {
+  margin-top: 0;
+}
+
+.album-related-story {
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.album-related-story h4 {
+  margin: 4px 0;
+  font-family: "Playfair Display", serif;
+  font-size: 19px;
+}
+
+.album-related-story p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 footer {
@@ -513,7 +626,8 @@ footer {
 }
 
 .modal-card input,
-.modal-card textarea {
+.modal-card textarea,
+.modal-card select {
   width: 100%;
   min-width: 0;
   padding: 12px 14px;
@@ -620,6 +734,8 @@ footer {
   transform: translateY(0);
 }
 
+/* TABLET */
+
 @media (min-width: 1400px) {
   .hero {
     padding-top: 120px;
@@ -645,14 +761,12 @@ footer {
     grid-column: 1 / -1;
   }
 
-  .album-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .navbar nav {
     gap: 16px;
   }
 }
+
+/* HP */
 
 @media (max-width: 600px) {
   .navbar {
@@ -748,13 +862,30 @@ footer {
   }
 
   .album-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 17px;
+    gap: 22px;
+    margin-right: -4px;
+  }
+
+  .album-card {
+    flex-basis: 105px;
+    width: 105px;
   }
 
   .album-cover,
   .album-placeholder {
-    height: 235px;
+    width: 88px;
+    height: 88px;
+    flex-basis: 88px;
+  }
+
+  .album-info h3 {
+    max-width: 105px;
+    font-size: 12px;
+  }
+
+  .album-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .timeline-card {
@@ -793,7 +924,9 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     scroll-behavior: auto !important;
     transition-duration: .01ms !important;
     animation-duration: .01ms !important;

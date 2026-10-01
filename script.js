@@ -262,7 +262,6 @@
       updateAdminUI();
 
       if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-        // Hindari pemanggilan langsung operasi Supabase di callback auth.
         setTimeout(() => loadAllData(), 0);
       }
     });
@@ -374,6 +373,17 @@
         ? `<p>📍 ${escapeHTML(story.lokasi)}</p>`
         : "";
 
+      const linkedAlbum = story.album_id
+        ? albumCache.find((item) => String(item.id) === String(story.album_id))
+        : null;
+
+      const albumLink = linkedAlbum
+        ? `<button class="story-album-link" data-story-album="${escapeHTML(linkedAlbum.id)}" type="button">
+             <span class="story-album-link-icon">♡</span>
+             Lihat highlight: ${escapeHTML(linkedAlbum.judul || linkedAlbum.title || "Album kenangan")} →
+           </button>`
+        : "";
+
       const actions = currentUser
         ? `<div class="inline-actions">
              <button class="danger-button" data-delete-story="${escapeHTML(story.id)}" type="button">Hapus cerita</button>
@@ -382,12 +392,13 @@
 
       return `
         <article class="timeline-card">
-          <div class="timeline-date">${escapeHTML(formatDate(story.tanggal))}</div>
-          <div>
-            <h3>${escapeHTML(story.judul)}</h3>
+          <div class="timeline-date">${escapeHTML(formatDate(story.tanggal || story.event_date))}</div>
+          <div class="timeline-content">
+            <h3>${escapeHTML(story.judul || story.title || "Kenangan kita")}</h3>
             ${location}
-            <p>${escapeHTML(story.cerita || "")}</p>
+            <p>${escapeHTML(story.cerita || story.description || "")}</p>
             ${photo}
+            ${albumLink}
             ${actions}
           </div>
         </article>
@@ -413,6 +424,7 @@
         tanggal: $("storyDate").value,
         lokasi: $("storyLocation").value.trim() || null,
         cerita: $("storyDescription").value.trim(),
+        album_id: $("storyAlbum")?.value || null,
         foto_url: uploaded?.url || null,
         foto_path: uploaded?.path || null,
         created_by: currentUser.id
@@ -449,7 +461,7 @@
     const story = storyCache.find((item) => String(item.id) === String(id));
     if (!story) return;
 
-    if (!confirm(`Hapus cerita "${story.judul}"?`)) return;
+    if (!confirm(`Hapus cerita "${story.judul || story.title || "Kenangan"}"?`)) return;
 
     try {
       const { error } = await db
@@ -491,6 +503,23 @@
 
     albumCache = data || [];
     renderAlbums();
+    renderStoryAlbumOptions();
+    renderStories();
+  }
+
+  function renderStoryAlbumOptions() {
+    const select = $("storyAlbum");
+    if (!select) return;
+
+    const selected = select.value;
+    select.innerHTML = '<option value="">Tidak dihubungkan ke album</option>' +
+      albumCache.map((album) => `
+        <option value="${escapeHTML(album.id)}">${escapeHTML(album.judul || album.title || "Album kenangan")}</option>
+      `).join("");
+
+    if (selected && albumCache.some((album) => String(album.id) === String(selected))) {
+      select.value = selected;
+    }
   }
 
   function renderAlbums() {
@@ -504,8 +533,9 @@
     }
 
     container.innerHTML = albumCache.map((album) => {
+      const albumTitle = album.judul || album.title || "Album kenangan";
       const cover = album.cover_url
-        ? `<img class="album-cover" src="${escapeHTML(album.cover_url)}" alt="Sampul ${escapeHTML(album.judul)}" loading="lazy">`
+        ? `<img class="album-cover" src="${escapeHTML(album.cover_url)}" alt="Sampul ${escapeHTML(albumTitle)}" loading="lazy">`
         : '<div class="album-placeholder">♡</div>';
 
       const actions = currentUser
@@ -518,11 +548,12 @@
       return `
         <article class="album-card">
           <button class="album-open" data-open-album="${escapeHTML(album.id)}" type="button">
-            ${cover}
+            <span class="highlight-ring">${cover}</span>
             <div class="album-info">
-              <h3>${escapeHTML(album.judul)}</h3>
-              <p>${escapeHTML(formatDate(album.tanggal))}</p>
+              <h3>${escapeHTML(albumTitle)}</h3>
+              <p>${escapeHTML(formatDate(album.tanggal || album.event_date))}</p>
               <p>${escapeHTML(album.lokasi || "Kenangan kita ♡")}</p>
+              <span class="highlight-hint">Buka highlight ♡</span>
             </div>
           </button>
           ${actions}
@@ -586,8 +617,8 @@
 
   /* 9. DETAIL ALBUM DAN FOTO */
 
-  async function openAlbum(id) {
-    const album = albumCache.find((item) => String(item.id) === String(id));
+  async function openAlbum(albumId) {
+    const album = albumCache.find((item) => String(item.id) === String(albumId));
     if (!album) {
       showToast("Album tidak ditemukan. Muat ulang halaman.");
       return;
@@ -595,12 +626,31 @@
 
     currentAlbum = album;
 
+    const albumTitle = album.judul || album.title || "Album kenangan";
+    const relatedStories = storyCache.filter(
+      (story) => String(story.album_id || "") === String(album.id)
+    );
+
+    const relatedStoriesHTML = relatedStories.length
+      ? relatedStories.map((story) => `
+          <article class="album-related-story">
+            <p class="timeline-date">${escapeHTML(formatDate(story.tanggal || story.event_date))}</p>
+            <h4>${escapeHTML(story.judul || story.title || "Kenangan kita")}</h4>
+            <p>${escapeHTML(story.cerita || story.description || "")}</p>
+          </article>
+        `).join("")
+      : '<p class="muted">Belum ada cerita timeline yang dihubungkan ke album ini.</p>';
+
     $("albumDetailContent").innerHTML = `
-      <p class="eyebrow">OUR MEMORIES</p>
-      <h2 class="album-detail-title">${escapeHTML(album.judul)}</h2>
-      <p class="muted">${escapeHTML(formatDate(album.tanggal))}${album.lokasi ? " · " + escapeHTML(album.lokasi) : ""}</p>
-      ${album.cover_url ? `<img class="album-detail-cover" src="${escapeHTML(album.cover_url)}" alt="Sampul ${escapeHTML(album.judul)}">` : ""}
-      <p class="album-detail-description">${escapeHTML(album.cerita || "Satu album, banyak kenangan indah. ♡")}</p>
+      <p class="eyebrow">OUR MEMORIES · HIGHLIGHT</p>
+      <h2 class="album-detail-title">${escapeHTML(albumTitle)}</h2>
+      <p class="muted">${escapeHTML(formatDate(album.tanggal || album.event_date))}${album.lokasi ? " · " + escapeHTML(album.lokasi) : ""}</p>
+      ${album.cover_url ? `<img class="album-detail-cover" src="${escapeHTML(album.cover_url)}" alt="Sampul ${escapeHTML(albumTitle)}">` : ""}
+      <p class="album-detail-description">${escapeHTML(album.cerita || album.description || "Satu album, banyak kenangan indah. ♡")}</p>
+      <section class="album-related-stories">
+        <h3>Cerita timeline di highlight ini</h3>
+        ${relatedStoriesHTML}
+      </section>
       <h3>Foto di dalam album</h3>
       <div id="photoGallery" class="photo-gallery"><p class="empty-state">Memuat foto...</p></div>
     `;
@@ -703,9 +753,6 @@
         ". Periksa galeri sebelum mencoba lagi.",
         true
       );
-
-      // Foto yang sudah berhasil disimpan ke database tidak dihapus otomatis.
-      // Ini mencegah data database menunjuk ke file yang sudah terhapus.
     } finally {
       setBusy(form, false);
     }
@@ -751,7 +798,7 @@
     const album = albumCache.find((item) => String(item.id) === String(id));
     if (!album) return;
 
-    if (!confirm(`Hapus album "${album.judul}" beserta semua foto di dalamnya?`)) {
+    if (!confirm(`Hapus album "${album.judul || album.title || "Album kenangan"}" beserta semua foto di dalamnya?`)) {
       return;
     }
 
@@ -868,6 +915,12 @@
     });
 
     $("timelineList")?.addEventListener("click", (event) => {
+      const albumButton = event.target.closest("[data-story-album]");
+      if (albumButton) {
+        openAlbum(albumButton.dataset.storyAlbum);
+        return;
+      }
+
       const button = event.target.closest("[data-delete-story]");
       if (button) deleteStory(button.dataset.deleteStory);
     });
